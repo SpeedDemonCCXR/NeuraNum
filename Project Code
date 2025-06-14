@@ -134,7 +134,7 @@ def numguessgame():
 
 # Creating the main window with two buttons, each button calling a different function
 servicemenu = tk.Tk()
-servicemenu.title("Numlock") 
+servicemenu.title("NeuraNum") 
 servicemenu.geometry("500x500") # The size of the opening window in px 
 servicemenu.configure(bg="lightblue") # Background color of the main window
 
