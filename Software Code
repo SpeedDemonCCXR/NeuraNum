@@ -1,0 +1,158 @@
+# Import tkinter for the GUI interface
+import tkinter as tk
+# Import math for Calculator, and import numexpr for safe evaluation of expressions
+import math
+# Import random and string for password generation
+import random
+import string
+import numexpr as ne # Importing numexpr for safe evaluation of expressions
+# Import pyperclip for the clip functionality 
+import pyperclip
+# Def the function window for the Password Generation 
+
+def pw_generation():
+    pw = string.ascii_letters + string.digits + string.punctuation
+
+    # Define one more nested function to properly create and display
+    def show_pw():
+        try:
+            paslen = int(length_entry.get())
+            password = ''.join(random.choice(pw) for _ in range(paslen))
+            password_output.delete(1.0, tk.END)
+            password_output.insert(tk.END, password)
+        except ValueError:
+            password_output.delete(1.0, tk.END)
+            password_output.insert(tk.END, "Invalid input, please enter a number.")
+
+    def copy_to_clipboard(): # Function to copy
+        password = password_output.get("1.0", "end-1c")
+        pyperclip.copy(password) # Copy the password to the clipboard
+
+    # A variable for a new window within the main window
+    pw_window = tk.Toplevel(servicemenu) 
+    pw_window.title("Password Generator App")
+    pw_window.configure(bg="lightgreen") # Background color of the new window
+    length_label = tk.Label(pw_window, text="Length:") # The label for the length entry field
+    length_label.pack() # Positioning
+    length_entry = tk.Entry(pw_window) # The entry field for the length
+    length_entry.pack() # Positioning
+    # Define a button that will display the generated password, and call the command that has the generated password
+    gbutton = tk.Button(pw_window, text="Generate Password", command=show_pw)
+    gbutton.pack() # Positioning 
+    password_label = tk.Label(pw_window, text="Generated Password:") # Defining the PW output label
+    password_label.pack() # Positioning
+    password_output = tk.Text(pw_window, height=5, width=40, font="Arial") # The password output field height and width and font
+    password_output.pack()
+    copy_button = tk.Button(pw_window, text="Copy To Clipboard", command=copy_to_clipboard) # The copy button with command to clip
+    copy_button.pack() # Positioning
+
+# Define the function that will open a new window for the Calculator and components of that ONLY
+def calculator():
+    
+    calc_window = tk.Toplevel(servicemenu) # A variable for a new window 
+    calc_window.title("Calculator")
+    calc_window.configure(bg="lightgreen") # Background color of the new window
+    enter_label = tk.Label(calc_window, text="Enter the equation:") # Label for entry field of equation
+    enter_label.pack() # Positioning 
+    entry = tk.Entry(calc_window) # The entry field for the equation
+    entry.pack() # Positioning
+    # Define a new function that will calculate the correct result and store it in a variable
+    def calc():
+        try:
+         equation = entry.get() # Retrieving the data from the entry var above
+         res = ne.evaluate(equation) # Evaluating the expression
+         # Clearing the output field before evaluation and then insertion of the ans after evaluation
+         result_output.delete(1.0, tk.END)
+         result_output.insert(tk.END, res)
+        except Exception as e:
+            result_output.delete(1.0, tk.END) # Clearing the output field before evaluation
+            result_output.insert(tk.END, "Invalid Input. Please enter a valid equation.")
+
+    anbtn = tk.Button(calc_window, text="Calculate Solution", command=calc, bg="lightblue") # The button to calculate and display the correct solution, and assign a color to it
+    anbtn.pack()
+    result_label = tk.Label(calc_window, text="Solution:") # Label for correct solution
+    result_label.pack() # Positioning 
+    result_output = tk.Text(calc_window, height=5, width=40, font="Arial")  # The output field with the specified height, width and font
+    result_output.pack() # Positioning
+
+# Define the function that will open a new window for the Number Guessing Game and components of that ONLY
+def numguessgame():
+    global attempts, number_to_guess # Initialize global variables. Must be declared to modify them inside the function. 
+
+    attempts = 0 # Initialize the attempts counter
+    number_to_guess = random.randint(1, 100) # The number to be gussed
+
+    # Create the new window for the Number Guessing game with the title and background color
+    numwindow = tk.Toplevel(servicemenu) 
+    numwindow.title("Number Guessing Game")
+    numwindow.configure(bg="lightgreen")
+    
+    # A label for the instructions to the user
+    glabel = tk.Label(numwindow, text="Enter a number between 1 and 100:")
+    glabel.pack() # Positioning 
+     
+    # An entry field for the user to input their guess
+    oneentry = tk.Entry(numwindow)
+    oneentry.pack() # Positioning
+    
+    # A label to display number of results
+    attemptslab = tk.Label(numwindow, text="Attempts: 0/12")
+    attemptslab.pack()
+
+    # To display result of the guess (too high/low). Configuring this will be done in the nested function.
+    guesslab = tk.Label(numwindow, text="")
+    guesslab.pack()
+
+    # A nested function to evaluate user input and update the guesslab and attemptslab labels accordingly.
+    def check_guess():
+        global attempts # Again, declaring it global to modify it inside the function! 
+
+        # Creating a try-except block to handle invalid input(s) with our code inside it
+        try:
+            guess = int(oneentry.get()) # The entry field for the user and retriveing it
+            attempts = attempts + 1 # Incrementing the attempts counter so that user has no more than 12 attempts
+            attemptslab.config(text=f"Attempts: {attempts}/12") # A label to show the number of attempts by the user
+            
+            # Check the guess against the correct answer, and statement if answer is small along with color of the label to orange
+            if guess < number_to_guess:
+                guesslab.config(text="Too small!", bg="orange")
+            # Check the guess against the correct answer, and statement if answer is big along with color of the label to blue
+            elif guess > number_to_guess:
+                guesslab.config(text="Too big!", bg="blue")
+            # Check the guess against the correct answer, and statement if answer is correct along with color of the label to green
+            else:
+                guesslab.config(text="Congratulations! You guessed the number!", bg="green")
+                guessbtn.config(state="disabled")
+            # If the user had made 12 attempts, disable the button and display the correct answer
+            if attempts >= 12:
+                guesslab.config(text=f"Game over! The number was {number_to_guess}.")
+                guessbtn.config(state="disabled") # Changing button state to disabled so user cannot click it anymore
+        # If user input is invalid, an error message will be displayed. This is the end of the try-except block.
+        except ValueError:
+            guesslab.config(text="Invalid input, please enter a number", bg="red")
+
+    # A button to submit the guess and call the check_guess function to verify the answer and display the labels accordingly
+    guessbtn = tk.Button(numwindow, text="Submit Guess", command=check_guess)
+    guessbtn.configure(bg="lightblue") # Color
+    guessbtn.pack() # Positioning
+
+# Creating the main window with two buttons, each button calling a different function
+servicemenu = tk.Tk()
+servicemenu.title("NeuraNum") 
+servicemenu.geometry("500x500") # The size of the opening window in px 
+servicemenu.configure(bg="lightblue") # Background color of the main window
+
+servicelabel = tk.Label(servicemenu, text="Welcome! Please select a service to continue.")
+servicelabel.configure(bg="lightgreen", font="Arial 14 bold")
+servicelabel.pack() # Positioning
+
+pwgenbtn = tk.Button(servicemenu, text="Password Generator", command=pw_generation) # Defining a button for password generation that will call the pw_generation function
+pwgenbtn.pack() # Positioning
+
+calcbtn = tk.Button(servicemenu, text="Calculator", command=calculator) # Defining a button for the calculator that will call the calculator function
+calcbtn.pack() # Positioning
+
+numguessbtn = tk.Button(servicemenu, text="Number Guessing Game", command=numguessgame) # Defining a button for the number guessing game that will call the numguessgame function
+numguessbtn.pack() # Positioning
+
+servicemenu.mainloop() # Running the main window
