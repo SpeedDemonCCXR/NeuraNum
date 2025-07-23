@@ -17,7 +17,6 @@ class NeuraNumModern:
         self.root.grid_rowconfigure(1, weight=1)
         self.root.grid_columnconfigure(0, weight=1)
 
-        # 🔷 Primary Notebook (row 0)
         self.notebook = tb.Notebook(self.root, bootstyle="secondary") # Options: primary, secondary, success, info, warning, danger, light, dark
         self.notebook.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
 
